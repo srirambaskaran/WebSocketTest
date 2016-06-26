@@ -38,10 +38,9 @@ public class TestUpdateEndPoint {
 
 	@OnClose
 	public void onClose(Session session) throws IOException, JSONException, EncodeException {
-		sessions.remove(session);
 		String userId = (String) session.getUserProperties().get("userId");
-		sendDisconnection(userId);
-
+		
+		sendDisconnection(userId,session);
 	}
 	
 	@OnError
@@ -72,11 +71,12 @@ public class TestUpdateEndPoint {
 		}
 	}
 
-	public void sendDisconnection(String userId) throws IOException, JSONException, EncodeException {
+	public void sendDisconnection(String userId, Session session) throws IOException, JSONException, EncodeException {
 		for (Session s : sessions) {
 			synchronized (s) {
 				s.getBasicRemote().sendObject(new JSONObject("{ \"userId\" : \""+userId+"\", \"message\" : \" has left the chat\"}"));
 			}
 		}
+		sessions.remove(session);
 	}
 }
